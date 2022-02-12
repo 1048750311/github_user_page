@@ -1,11 +1,22 @@
 <template>
-     <div class="row">
-      <div class="card" v-for="user in users" :key="user.login">
+    <div class="row">
+        <!-- 展示用户列表 -->
+      <div v-show="info.users.length" class="card" v-for="user in info.users" :key="user.login">
         <a :href="user.html_url" target="_blank">
           <img :src="user.avatar_url" style='width: 100px'/>
         </a>
         <p class="card-text">{{user.login}}</p>
       </div>
+   
+        <!-- 展示欢迎词 -->
+      <h1 v-show="info.isFirstShow" >welcome to github user page</h1>
+        <!-- 展示加载中 -->
+      <h1 v-show="info.isLoading">loading</h1>
+        <!-- 展示错误信息 -->
+      <h1 v-show="info.errMsg">{{info.errMsg}}</h1>               
+
+
+
     </div>
 </template>
 
@@ -15,15 +26,26 @@ export default {
   name: "List",
   data() {
     return {
-      users: []
+      info: {
+        isFirstShow: true,
+        isLoading: false,
+        errMsg: "",
+        users: []
+      }
     };
   },
   mounted() {
-    this.$bus.$on('getUsers',(users)=>{
-      this.users = users
-
-    })
-  },
+    this.$bus.$on("updateListData", dataobj => {
+      console.log(dataobj);
+      this.info = {...this.info,...dataobj};  //用后面比较前面同名属性，后面覆盖前面同名的，后面没有的按前面算
+      console.log(this.info);
+      
+      // this.isFirstShow = isFirstShow;
+      // this.isLoading = isLoading;
+      // this.errMsg = errMsg;
+      // this.users = users;
+    });
+  }
 };
 </script>
 
